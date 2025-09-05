@@ -1,26 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import dotenv from 'dotenv';
+import express from "express";
+import cors from "cors";
+import { PrismaClient } from "@prisma/client";
+import userRoutes from "./routes/users";
 
-dotenv.config();
+const app = express();
 const prisma = new PrismaClient();
+const PORT = process.env.PORT || 4000;
 
-export const app = express();
-export default prisma;
+// CORS
+app.use(cors({
+  origin: "http://localhost:3000" // React corre en 3000
+}));
 
-const port = 3010;
+app.use(express.json());
+app.use("/users", userRoutes(prisma));
 
-app.get('/', (req, res) => {
-  res.send('Hola LTI!');
-});
-
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.type('text/plain'); 
-  res.status(500).send('Something broke!');
-});
-
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`);
 });
